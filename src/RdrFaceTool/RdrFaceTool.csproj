@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- The facial converter's tool (tools/rdr_face): needs nothing but RdrAnimCore, runs on Windows and Linux.
+       Published self-contained (publish.bat), so the machine needs no .NET either. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <InvariantGlobalization>true</InvariantGlobalization>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RdrAnimCore\RdrAnimCore.csproj" />
+  </ItemGroup>
+
+</Project>

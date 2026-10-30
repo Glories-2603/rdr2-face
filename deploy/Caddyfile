@@ -1,0 +1,10 @@
+face.example.com {
+	request_body {
+		max_size 210MB
+	}
+	reverse_proxy 127.0.0.1:8776 {
+		transport http {
+			read_timeout 30m
+		}
+	}
+}

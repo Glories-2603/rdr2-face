@@ -1,0 +1,14 @@
+[Unit]
+Description=RDR 2 Face (facial animation converter)
+After=network.target
+
+[Service]
+User=rdrface
+WorkingDirectory=/opt/rdr2-face
+Environment=RDR_FACE_PASSWORD=change-me
+ExecStart=/opt/rdr2-face/venv/bin/python server.py --port 8776
+Restart=always
+Nice=5
+
+[Install]
+WantedBy=multi-user.target

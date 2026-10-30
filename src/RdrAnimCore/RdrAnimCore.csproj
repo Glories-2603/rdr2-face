@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    GTA V -> RDR 2 animation porting without CodeX: own GTA ycd (RSC7) reader, retargeting, RDR sequence encoder
+    and packer, and an in-place patcher of an embedded RDR clip dictionary. Only needs .NET.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>RdrAnimCore</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.IO.Hashing" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Skeletons (from the user's exported mp_m_freemode_01.yft / meta_base_mp_male.yft) and the RDR template
+         dictionary (decompressed), so no game files or CodeX are needed at runtime. -->
+    <EmbeddedResource Include="Data\gta_skeleton.json" LogicalName="gta_skeleton.json" />
+    <EmbeddedResource Include="Data\rdr_skeleton.json" LogicalName="rdr_skeleton.json" />
+    <EmbeddedResource Include="Data\carrier.bin" LogicalName="carrier.bin" />
+    <EmbeddedResource Include="Data\carrier_face.bin" LogicalName="carrier_face.bin" />
+  </ItemGroup>
+
+</Project>

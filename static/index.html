@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RDR 2 Face</title>
+<link rel="stylesheet" href="/static/style.css?v=1">
+<link rel="stylesheet" href="/static/face.css?v=1">
+<script type="importmap">
+{ "imports": {
+    "three": "/static/vendor/three/three.module.js",
+    "three/addons/": "/static/vendor/three/addons/"
+} }
+</script>
+</head>
+<body class="mode-convert">
+<div id="stage"></div>
+
+<header class="topbar chrome">
+  <div class="brand">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="11" r="8"/><path d="M9 9.5h.01M15 9.5h.01M8.5 14c1 1.4 2.2 2 3.5 2s2.5-.6 3.5-2"/></svg>
+    <div><strong>RDR 2 <span>Face</span></strong><small>лицевые анимации для RedM</small></div>
+  </div>
+  <div class="segmented" role="radiogroup" aria-label="Режим">
+    <label><input type="radio" name="mode" value="convert" checked><span>Перенос из GTA V</span></label>
+    <label><input type="radio" name="mode" value="edit"><span>Редактор</span></label>
+  </div>
+  <div class="segmented" role="radiogroup" aria-label="Персонаж">
+    <label><input type="radio" name="sex" value="m" checked><span>♂ Мужчина</span></label>
+    <label><input type="radio" name="sex" value="f"><span>♀ Женщина</span></label>
+  </div>
+  <span class="top-spacer"></span>
+  <label class="inline-label" title="Язык"><select id="lang" aria-label="Язык"><option value="ru">RU</option><option value="en">EN</option></select></label>
+  <button id="exportBtn" class="primary" title="Готовый ресурс RedM со всеми лицевыми анимациями библиотеки">Экспорт ресурса</button>
+</header>
+
+<!-- ============================== GTA conversion -->
+<aside id="left" class="panel chrome convert-only">
+  <div class="panel-title"><strong>Из GTA V</strong></div>
+  <div class="panel-scroll">
+    <label id="drop" class="dropzone">
+      <input id="files" type="file" multiple accept=".ycd" hidden>
+      <svg viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M4 16v4h16v-4"/></svg>
+      <span><strong>Перетащите .ycd GTA V</strong><br>словари с лицевыми анимациями (facials@…, mp_facial и моды)</span>
+    </label>
+    <div id="uploads"></div>
+    <div class="row sticky-actions">
+      <button id="selAll">Выбрать все</button>
+      <button id="convertBtn" class="primary" disabled>Перенести выбранное</button>
+    </div>
+    <div id="job" class="job" hidden>
+      <div class="progress"><div id="jobBar"></div></div>
+      <div id="jobLog" class="log"></div>
+    </div>
+    <p class="hint">Лицо GTA считается её же выражением лица, движение губ, век, бровей, щёк и челюсти переносится на
+      лицо RDR (121 канал). Процент — насколько точно повторено движение.</p>
+  </div>
+</aside>
+
+<!-- ============================== editor -->
+<aside id="eleft" class="panel chrome edit-only">
+  <div class="panel-title"><strong>Лицо</strong><span id="keyInfo" class="pill"></span></div>
+  <div class="panel-scroll">
+    <label class="field">Поза из игры
+      <select id="preset"><option value="">— выбрать —</option></select></label>
+    <div class="row"><button id="applyPreset">Поставить в кадр</button><button id="zeroKey">Сбросить кадр</button></div>
+    <input id="search" type="search" placeholder="Поиск канала: губа, веко, бровь…">
+    <div id="controls"></div>
+  </div>
+</aside>
+
+<aside id="right" class="panel chrome">
+  <div class="panel-title"><strong>Библиотека</strong><span id="libCount" class="pill"></span></div>
+  <div class="panel-scroll">
+    <p class="hint">Готовые лицевые анимации. ▶ — посмотреть на голове, ✎ — открыть в редакторе.</p>
+    <div id="library" class="lib"></div>
+  </div>
+</aside>
+
+<!-- timeline (editor) -->
+<div id="timeline" class="chrome edit-only">
+  <div class="tl-row">
+    <button id="playBtn" class="icon-button" title="Играть / пауза" aria-label="Играть"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7Z"/></svg></button>
+    <output id="timeOut">0.00 с</output>
+    <div id="track" class="tl-track"><div id="keys"></div><div id="cursor"></div></div>
+    <label class="inline-label">Длина, с<input id="duration" type="number" min="0.2" max="600" step="0.1" value="3"></label>
+  </div>
+  <div class="tl-row">
+    <button id="addKey" title="Ключевой кадр в текущем времени (копия текущей позы)">+ Ключ</button>
+    <button id="delKey" class="danger" title="Удалить ключ под курсором">Удалить ключ</button>
+    <label class="inline-label">Переходы<select id="interp"><option value="smooth">плавные</option><option value="linear">линейные</option></select></label>
+    <label class="inline-label"><span>Повтор</span><input type="checkbox" id="loopPrev" checked></label>
+    <span class="top-spacer"></span>
+    <input id="itemName" type="text" placeholder="Название (latin): smile_wink" spellcheck="false">
+    <button id="newBtn">Новая</button>
+    <button id="saveBtn" class="primary">Сохранить в библиотеку</button>
+  </div>
+</div>
+
+<div id="toast" class="toast" hidden></div>
+
+<dialog id="exportDlg">
+  <form method="dialog">
+    <h2>Экспорт ресурса RedM</h2>
+    <p class="hint">Все анимации библиотеки — в один ресурс: stream со словарями, команда и экспорты PlayFace / StopFace.
+      Играет только лицо, анимация тела не прерывается.</p>
+    <label class="field">Имя ресурса<input id="expRes" type="text" spellcheck="false"></label>
+    <label class="field">Префикс словарей<input id="expPrefix" type="text" spellcheck="false"></label>
+    <label class="field">Команда<input id="expCmd" type="text" spellcheck="false"></label>
+    <label class="field">Сразу положить в папку resources (необязательно)<input id="expFolder" type="text" spellcheck="false" placeholder="D:\redm-server\resources\[faces]"></label>
+    <div id="expResult" class="log"></div>
+    <div class="row end"><button value="cancel">Закрыть</button><button id="expGo" class="primary" type="button">Собрать</button></div>
+  </form>
+</dialog>
+
+<script type="module" src="/static/app.js?v=3"></script>
+</body>
+</html>
