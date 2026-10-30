@@ -1,7 +1,7 @@
 # game data (Rockstar), the built tool, user files
-assets/
-data/
-bin/
+/assets/
+/data/
+/bin/
 src/RdrAnimCore/Data/*.bin
 src/RdrAnimCore/Data/*.json
 venv/
